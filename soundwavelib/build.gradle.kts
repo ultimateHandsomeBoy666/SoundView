@@ -33,9 +33,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.core.ktx)
     implementation(libs.appcompat)
-    implementation(libs.com.google.android.material.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)

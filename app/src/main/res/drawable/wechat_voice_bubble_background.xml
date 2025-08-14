@@ -9,10 +9,10 @@
     </item>
     
     <!-- 底部小三角 -->
-    <item 
-        android:gravity="bottom|left"
+    <item
+        android:gravity="bottom|center"
         android:left="16dp"
-        android:bottom="-6dp">
+        android:bottom="6dp">
         <rotate
             android:fromDegrees="45"
             android:toDegrees="45"
@@ -20,8 +20,8 @@
             android:pivotY="50%">
             <shape android:shape="rectangle">
                 <solid android:color="#95D75B" />
-                <size 
-                    android:width="12dp" 
+                <size
+                    android:width="12dp"
                     android:height="12dp" />
             </shape>
         </rotate>

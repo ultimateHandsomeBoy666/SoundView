@@ -1,8 +1,10 @@
-package com.soundwave.lib
+package com.soundwave.ui
 
 import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import com.soundwave.lib.SoundWaveView
+import com.soundwave.soundwave.R
 
 class VoiceBubbleView @JvmOverloads constructor(
     context: Context,
@@ -21,12 +23,11 @@ class VoiceBubbleView @JvmOverloads constructor(
             resources.getDimensionPixelSize(R.dimen.voice_bubble_padding_horizontal),
             resources.getDimensionPixelSize(R.dimen.voice_bubble_padding_vertical),
             resources.getDimensionPixelSize(R.dimen.voice_bubble_padding_horizontal),
-            resources.getDimensionPixelSize(R.dimen.voice_bubble_padding_vertical_bottom)
+            resources.getDimensionPixelSize(R.dimen.voice_bubble_padding_vertical)
         )
         
         // 创建并添加SoundWaveView
         soundWaveView = SoundWaveView(context, attrs)
-        soundWaveView.setColor(android.graphics.Color.WHITE)
         addView(soundWaveView)
     }
 
