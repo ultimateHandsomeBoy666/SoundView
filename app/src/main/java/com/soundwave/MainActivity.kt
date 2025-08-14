@@ -1,19 +1,19 @@
-package com.taobao.android.soundwave
+package com.soundwave
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.taobao.android.soundwave.databinding.ActivityMainBinding
+import com.soundwave.soundwave.databinding.ActivityMainBinding
 import kotlin.concurrent.thread
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : Activity() {
 
     private lateinit var binding: ActivityMainBinding
     private var audioRecord: AudioRecord? = null
@@ -90,13 +90,29 @@ class MainActivity : AppCompatActivity() {
                     lastUpdateTime = currentTime
                     val audioData = buffer.copyOf(readSize)
                     val maxAmplitude = audioData.maxOrNull()?.toFloat() ?: 0f
+                    val volume = calculateVolume(audioData)
                     runOnUiThread {
-                        binding.waveformView.updateData(audioData)
-                        binding.volumeTextView.text = "Volume: ${maxAmplitude.toInt()}\n bufferSize = $bufferSize"
+                        binding.voiceBubbleView.handleVolume(volume)
+                        binding.volumeTextView.text = "Volume: $volume (Max: ${maxAmplitude.toInt()})\n bufferSize = $bufferSize"
                     }
                 }
             }
         }
+    }
+
+    private fun calculateVolume(audioData: ShortArray): Int {
+        if (audioData.isEmpty()) return 0
+        
+        // 计算RMS (Root Mean Square) 值
+        var sum = 0.0
+        for (sample in audioData) {
+            sum += sample * sample
+        }
+        val rms = kotlin.math.sqrt(sum / audioData.size)
+        
+        // 将RMS值转换为0-35的范围（对应SoundWaveView的minVolume-maxVolume）
+        val normalizedVolume = (rms / 32768.0 * 35).toInt()
+        return normalizedVolume.coerceIn(0, 35)
     }
 
     override fun onStop() {
@@ -105,5 +121,9 @@ class MainActivity : AppCompatActivity() {
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
+        binding.voiceBubbleView.stopDance()
     }
+
+
+
 }

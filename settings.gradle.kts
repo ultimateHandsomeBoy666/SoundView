@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "SoundWave"
 include(":app")
+include(":soundwavelib")
  

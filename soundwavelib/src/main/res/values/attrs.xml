@@ -1,0 +1,16 @@
+<resources>
+    <declare-styleable name="SoundWaveView">
+        <attr name="volumeCount" format="integer" />
+        <attr name="volumeIdleCount" format="integer" />
+        <attr name="minVolume" format="integer" />
+        <attr name="maxVolume" format="integer" />
+        <attr name="danceDuration" format="integer" />
+        <attr name="maxDanceDelay" format="integer" />
+        <attr name="idleDuration" format="integer" />
+        <attr name="minVolumeBarHeight" format="dimension|reference" />
+        <attr name="maxVolumeBarHeight" format="dimension|reference" />
+        <attr name="volumeBarMargin" format="dimension|reference" />
+        <attr name="volumeBarHalfWidth" format="dimension|reference" />
+        <attr name="volumeBarColor" format="color|reference" />
+    </declare-styleable>
+</resources>

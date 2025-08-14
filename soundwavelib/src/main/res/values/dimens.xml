@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="voice_bubble_padding_horizontal">16dp</dimen>
+    <dimen name="voice_bubble_padding_vertical">12dp</dimen>
+    <dimen name="voice_bubble_padding_vertical_bottom">18dp</dimen>
+</resources>
