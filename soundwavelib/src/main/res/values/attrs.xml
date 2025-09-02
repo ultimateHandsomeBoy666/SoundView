@@ -7,6 +7,7 @@
         <attr name="danceDuration" format="integer" />
         <attr name="maxDanceDelay" format="integer" />
         <attr name="idleDuration" format="integer" />
+        <attr name="maxIdleHeight" format="dimension|reference" />
         <attr name="minVolumeBarHeight" format="dimension|reference" />
         <attr name="maxVolumeBarHeight" format="dimension|reference" />
         <attr name="volumeBarMargin" format="dimension|reference" />

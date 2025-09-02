@@ -7,14 +7,27 @@
     android:layout_height="match_parent"
     tools:context="com.soundwave.MainActivity">
 
-    <com.soundwave.ui.VoiceBubbleView
-        android:id="@+id/voiceBubbleView"
+    <com.soundwave.WechatBubbleFrameLayout
+        android:id="@+id/wechatBubbleView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+        
+        <com.soundwave.lib.SoundWaveView
+            android:id="@+id/soundWaveView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:volumeBarColor="#A0000000"
+            app:volumeIdleCount="12"
+            app:maxVolumeBarHeight="45dp"
+            app:minVolumeBarHeight="4dp"
+            app:volumeBarHalfWidth="0.9dp"
+            app:volumeBarMargin="0.8dp"/>
+            
+    </com.soundwave.WechatBubbleFrameLayout>
 
     <TextView
         android:id="@+id/volumeTextView"
@@ -26,6 +39,6 @@
         android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/voiceBubbleView" />
+        app:layout_constraintTop_toBottomOf="@+id/wechatBubbleView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

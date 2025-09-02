@@ -19,6 +19,8 @@ class MainActivity : Activity() {
     private var audioRecord: AudioRecord? = null
     private var recordingThread: Thread? = null
     private var isRecording = false
+    private val dbCalculator = DBCalculator()
+    private var lastRecordTime = 0L
 
     companion object {
         private const val REQUEST_RECORD_AUDIO_PERMISSION = 200
@@ -80,39 +82,20 @@ class MainActivity : Activity() {
 
         recordingThread = thread(start = true) {
             val buffer = ShortArray(bufferSize)
-            var lastUpdateTime = 0L
             while (isRecording) {
                 val readSize = audioRecord?.read(buffer, 0, buffer.size) ?: 0
-                if (readSize > 0) {
-                    val currentTime = System.currentTimeMillis()
-                    val gap = currentTime - lastUpdateTime
-                    Log.e("niuwa", "currentTime - lastUpdateTime = ${gap}")
-                    lastUpdateTime = currentTime
+                if (readSize > 0 && System.currentTimeMillis() - lastRecordTime > 250L) {
+                    lastRecordTime = System.currentTimeMillis()
                     val audioData = buffer.copyOf(readSize)
                     val maxAmplitude = audioData.maxOrNull()?.toFloat() ?: 0f
-                    val volume = calculateVolume(audioData)
+                    val volume = dbCalculator.calculateDB(audioData, audioData.size).toInt() + 10
                     runOnUiThread {
-                        binding.voiceBubbleView.handleVolume(volume)
+                        binding.soundWaveView.handleVolume(volume)
                         binding.volumeTextView.text = "Volume: $volume (Max: ${maxAmplitude.toInt()})\n bufferSize = $bufferSize"
                     }
                 }
             }
         }
-    }
-
-    private fun calculateVolume(audioData: ShortArray): Int {
-        if (audioData.isEmpty()) return 0
-        
-        // 计算RMS (Root Mean Square) 值
-        var sum = 0.0
-        for (sample in audioData) {
-            sum += sample * sample
-        }
-        val rms = kotlin.math.sqrt(sum / audioData.size)
-        
-        // 将RMS值转换为0-35的范围（对应SoundWaveView的minVolume-maxVolume）
-        val normalizedVolume = (rms / 32768.0 * 35).toInt()
-        return normalizedVolume.coerceIn(0, 35)
     }
 
     override fun onStop() {
@@ -121,7 +104,6 @@ class MainActivity : Activity() {
         audioRecord?.stop()
         audioRecord?.release()
         audioRecord = null
-        binding.voiceBubbleView.stopDance()
     }
 
 

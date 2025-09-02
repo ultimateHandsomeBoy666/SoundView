@@ -16,6 +16,7 @@ import com.soundwave.lib.State.Companion.DANCE
 import com.soundwave.lib.State.Companion.STOP
 import kotlin.math.pow
 import kotlin.random.Random
+import kotlin.time.times
 
 class VolumeDanceInterpolator : Interpolator {
 
@@ -134,7 +135,12 @@ open class SoundWaveView @JvmOverloads constructor (
                 danceStartTime = currentTime + danceStartDelay
                 val volume = currentVolume.coerceAtLeast(minVolume).coerceAtMost(maxVolume)
                 val rawHeight = 1f * (volume - minVolume) / (maxVolume - minVolume) * (maxVolumeBarHeight - minVolumeBarHeight) + minVolumeBarHeight
-                height = (rawHeight * volumeHeightDistribution[index]).toInt()
+                val heightPortion = if (index in 0 until volumeHeightDistribution.size) {
+                    volumeHeightDistribution[index]
+                } else {
+                    1f
+                }
+                height = (rawHeight * heightPortion).toInt()
             }
             val fraction = 1f * (currentTime - danceStartTime) / danceDuration
             val drawHeight = if (fraction in 0f..1f) {
@@ -168,23 +174,24 @@ open class SoundWaveView @JvmOverloads constructor (
     var maxDanceDelay = 80
     var idleDuration = 3500
 
+    var maxIdleHeight = dp2px(16f)
     var minVolumeBarHeight = dp2px(8f)
     var maxVolumeBarHeight = dp2px(36f)
     var volumeBarMargin = dp2px(3f)
     var volumeBarHalfWidth = dp2px(1.5f)
-    var volumeHeightDistribution = floatArrayOf(
-        0.2f, 0.4f, 0.5f, 0.6f, 1f, 1.1f, 0.95f, 0.9f, 0.8f,
+    private var volumeHeightDistribution = floatArrayOf(
+        0.6f, 0.6f, 0.6f, 0.8f, 1f, 1.1f, 0.95f, 0.9f, 0.8f,
         0.75f, 0.8f, 0.9f, 0.95f, 1f, 1.1f, 1.2f, 1.5f, 1.4f, 1.3f,
         1.4f, 1.5f, 1.2f, 1.1f, 1f, 0.95f, 0.9f, 0.8f, 0.75f, 0.8f,
-        0.9f, 0.95f, 1.1f, 1f, 0.6f, 0.5f, 0.4f, 0.2f
+        0.9f, 0.95f, 1.1f, 1f, 0.8f, 0.6f, 0.6f, 0.6f
     )
-    private var volumeBarColor = Color.parseColor("#11192D")
+    private var volumeBarColor = Color.parseColor("#A0000000")
 
     @State
     private var state = INIT
     private var volumeBarList = mutableListOf<VolumeBar>()
     private var currentVolume = -1
-    private val interpolator = VolumeDanceInterpolator()
+    private var interpolator: Interpolator = VolumeDanceInterpolator()
     private val random = Random(1)
     private val volumePaint = Paint()
 
@@ -203,10 +210,11 @@ open class SoundWaveView @JvmOverloads constructor (
             volumeCount = typedArray.getInt(R.styleable.SoundWaveView_volumeCount, 37)
             volumeIdleCount = typedArray.getInt(R.styleable.SoundWaveView_volumeIdleCount, 16)
             minVolume =  typedArray.getInt(R.styleable.SoundWaveView_minVolume, 4)
-            maxVolume =  typedArray.getInt(R.styleable.SoundWaveView_maxVolume, 35)
+            maxVolume =  typedArray.getInt(R.styleable.SoundWaveView_maxVolume, 50)
             danceDuration = typedArray.getInt(R.styleable.SoundWaveView_danceDuration, 250)
             maxDanceDelay = typedArray.getInt(R.styleable.SoundWaveView_maxDanceDelay, 80)
             idleDuration = typedArray.getInt(R.styleable.SoundWaveView_idleDuration, 3500)
+            maxIdleHeight = typedArray.getDimensionPixelSize(R.styleable.SoundWaveView_maxIdleHeight, dp2px(16f))
             minVolumeBarHeight = typedArray.getDimensionPixelSize(R.styleable.SoundWaveView_minVolumeBarHeight, dp2px(8f))
             maxVolumeBarHeight = typedArray.getDimensionPixelSize(R.styleable.SoundWaveView_maxVolumeBarHeight, dp2px(36f))
             volumeBarMargin = typedArray.getDimensionPixelSize(R.styleable.SoundWaveView_volumeBarMargin, dp2px(3f))
@@ -231,9 +239,8 @@ open class SoundWaveView @JvmOverloads constructor (
         return (currentVolume + newVolume) / 2
     }
 
-    // 获取音柱缓动高度
     private fun getIdleHeight(x: Int): Float {
-        return 0.0463f * x * x * (12 - x) + 8
+        return (x + 4).toFloat()
     }
 
     fun handleVolume(newVolume: Int) {
@@ -249,8 +256,18 @@ open class SoundWaveView @JvmOverloads constructor (
         }
     }
 
-    fun recordVolume(newVolume: Int) {
-        handleVolume(newVolume)
+    /**
+     * 设置音柱高度分布，floatArray 的长度应该等于 volumeCount
+     */
+    fun setDistribution(distribution: FloatArray) {
+        volumeHeightDistribution = distribution
+    }
+
+    /**
+     * 设置单个音柱的跳动长度变化插值器
+     */
+    fun setInterpolator(interpolator: Interpolator) {
+        this.interpolator = interpolator
     }
 
     fun enableIdle(enable: Boolean) {
@@ -265,11 +282,11 @@ open class SoundWaveView @JvmOverloads constructor (
         volumePaint.color = color
     }
 
-    internal fun isStop(): Boolean {
+    fun isStop(): Boolean {
         return state == STOP
     }
 
-    internal fun getContentWidth(): Int {
+    fun getWaveAreaWidth(): Int {
         val size: Int = volumeBarList.size
         return size * 2 * volumeBarHalfWidth + (size - 1) * volumeBarMargin
     }
