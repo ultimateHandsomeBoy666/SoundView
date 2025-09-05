@@ -33,6 +33,9 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.bigSoundView.setIdleHeightGetter { x ->
+            0.07f * x * x * (12 - x) + 4
+        }
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED
@@ -91,6 +94,7 @@ class MainActivity : Activity() {
                     val volume = dbCalculator.calculateDB(audioData, audioData.size).toInt() + 10
                     runOnUiThread {
                         binding.soundWaveView.handleVolume(volume)
+                        binding.bigSoundView.handleVolume(volume)
                         binding.volumeTextView.text = "Volume: $volume (Max: ${maxAmplitude.toInt()})\n bufferSize = $bufferSize"
                     }
                 }

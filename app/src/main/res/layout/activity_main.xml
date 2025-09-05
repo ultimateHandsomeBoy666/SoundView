@@ -11,7 +11,8 @@
         android:id="@+id/wechatBubbleView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintBottom_toTopOf="@id/bigSoundView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -33,12 +34,31 @@
         android:id="@+id/volumeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
         android:text="Volume: 0"
         android:textSize="24sp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wechatBubbleView" />
+        app:layout_constraintTop_toBottomOf="@id/bigSoundView" />
+
+    <com.soundwave.lib.SoundWaveView
+        android:id="@+id/bigSoundView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/sound_bg"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/wechatBubbleView"
+        app:maxVolumeBarHeight="45dp"
+        app:minVolumeBarHeight="4dp"
+        app:volumeBarColor="@color/white"
+        app:volumeBarHalfWidth="1.5dp"
+        app:volumeBarMargin="2dp"
+        app:volumeCount="38"
+        app:volumeIdleCount="16" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

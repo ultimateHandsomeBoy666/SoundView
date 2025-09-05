@@ -16,7 +16,6 @@ import com.soundwave.lib.State.Companion.DANCE
 import com.soundwave.lib.State.Companion.STOP
 import kotlin.math.pow
 import kotlin.random.Random
-import kotlin.time.times
 
 class VolumeDanceInterpolator : Interpolator {
 
@@ -194,6 +193,12 @@ open class SoundWaveView @JvmOverloads constructor (
     private var interpolator: Interpolator = VolumeDanceInterpolator()
     private val random = Random(1)
     private val volumePaint = Paint()
+    private var idleHeightGetter: (Int) -> Float = { x ->
+        (x + 4).toFloat()
+    }
+    private var volumeChangeSmoother: (Int, Int) -> Int = { currentVolume, newVolume ->
+        (currentVolume + newVolume) / 2
+    }
 
     private var enableIdle = true
 
@@ -234,26 +239,41 @@ open class SoundWaveView @JvmOverloads constructor (
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.resources.displayMetrics).toInt()
     }
 
-    // 用来平滑变化音量
-    private fun mollifyVolumeChange(newVolume: Int): Int {
-        return (currentVolume + newVolume) / 2
-    }
-
-    private fun getIdleHeight(x: Int): Float {
-        return (x + 4).toFloat()
-    }
-
     fun handleVolume(newVolume: Int) {
         if (currentVolume < 0) {
             currentVolume = newVolume
             return
         }
-        currentVolume = mollifyVolumeChange(newVolume)
-        if ((currentVolume < minVolume) && enableIdle) {
-            state = IDLE
+        currentVolume = smoothVolumeChange(newVolume)
+        state = if ((currentVolume < minVolume) && enableIdle) {
+            IDLE
         } else {
-            state = DANCE
+            DANCE
         }
+    }
+
+    // 用来平滑变化音量
+    private fun smoothVolumeChange(newVolume: Int): Int {
+        return (currentVolume + newVolume) / 2
+    }
+
+    private fun getIdleHeight(x: Int): Float {
+        return idleHeightGetter.invoke(x)
+    }
+
+    /**
+     * 设置音量平滑规则，避免当新音量来的时候，和当前音量差距过大导致跳跃过大
+     * 一般用初始设置就行
+     */
+    fun setVolumeChangeSmoother(smoother: (Int, Int) -> Int) {
+        this.volumeChangeSmoother = smoother
+    }
+
+    /**
+     * 设置缓动的音柱高度变化函数，x是正在缓动的音柱的索引
+     */
+    fun setIdleHeightGetter(idleHeightGetter: (x: Int) -> Float) {
+        this.idleHeightGetter = idleHeightGetter
     }
 
     /**
@@ -270,14 +290,23 @@ open class SoundWaveView @JvmOverloads constructor (
         this.interpolator = interpolator
     }
 
+    /**
+     * 是否启用音浪缓动
+     */
     fun enableIdle(enable: Boolean) {
         enableIdle = enable
     }
 
+    /**
+     * 停止跳动音浪
+     */
     fun stopDance() {
         state = STOP
     }
 
+    /**
+     * 设置音柱颜色
+     */
     fun setColor(color: Int) {
         volumePaint.color = color
     }
