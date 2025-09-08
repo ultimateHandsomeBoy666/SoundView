@@ -12,6 +12,7 @@ compose-bom = "2024.06.00"
 appcompat = "1.6.1"
 material = "1.12.0"
 constraintlayout = "2.1.4"
+maven-publish = "0.28.0"
 
 [libraries]
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "android-gradle-plugin" }
@@ -40,4 +41,4 @@ android-application = { id = "com.android.application", version.ref = "android-g
 android-library = { id = "com.android.library", version.ref = "android-gradle-plugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.compose", version.ref = "kotlin-compose" }
-
+vanniktech-maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }

@@ -1,12 +1,10 @@
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    `maven-publish`
-    signing
+    alias(libs.plugins.vanniktech.maven.publish)
 }
-
-group = "io.github.ultimatehandsomeboy666"
-version = "1.0.0"
 
 android {
     namespace = "com.soundwave.lib"
@@ -35,63 +33,36 @@ android {
     }
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from(components["release"])
+mavenPublishing {
+    coordinates("io.github.ultimatehandsomeboy666", "soundwavelib", "1.0.0")
 
-                pom {
-                    name.set("SoundWave")
-                    description.set("A SoundView that dances with volume changing")
-                    url.set("https://github.com/ultimateHandsomeBoy666/SoundView")
+    pom {
+        name.set("SoundWave")
+        description.set("A SoundView that dances with volume changing")
+        url.set("https://github.com/ultimateHandsomeBoy666/SoundView")
 
-                    licenses {
-                        license {
-                            name.set("The Apache License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set("ultimateHandsomeBoy666")
-                            name.set("bullfrog")
-                            email.set("jiujiuli@qq.com")
-                        }
-                    }
-                    scm {
-                        connection.set("scm:git:github.com/ultimateHandsomeBoy666/SoundWave.git")
-                        developerConnection.set("scm:git:ssh://github.com/ultimateHandsomeBoy666/SoundWave.git")
-                        url.set("https://github.com/ultimateHandsomeBoy666/SoundWave/tree/main")
-                    }
-                }
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-        repositories {
-            maven {
-                name = "Sonatype"
-                val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl)
-                
-                credentials {
-                    username = project.properties["ossrhUsername"] as String?
-                    password = project.properties["ossrhPassword"] as String?
-                }
+        developers {
+            developer {
+                id.set("ultimateHandsomeBoy666")
+                name.set("bullfrog")
+                email.set("jiujiuli@qq.com")
             }
         }
+        scm {
+            connection.set("scm:git:github.com/ultimateHandsomeBoy666/SoundWave.git")
+            developerConnection.set("scm:git:ssh://github.com/ultimateHandsomeBoy666/SoundWave.git")
+            url.set("https://github.com/ultimateHandsomeBoy666/SoundWave/tree/main")
+        }
     }
-}
 
-// 6. 配置 GPG 签名
-signing {
-    val signingKeyId = project.properties["signing.keyId"] as String?
-    val signingPassword = project.properties["signing.password"] as String?
-    val signingKey = project.properties["signing.secretKeyRingFile"] as String?
-    
-    if (signingKeyId != null) {
-        sign(publishing.publications)
-    }
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
 }
 
 dependencies {
