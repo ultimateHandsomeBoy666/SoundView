@@ -254,7 +254,7 @@ open class SoundWaveView @JvmOverloads constructor (
 
     // 用来平滑变化音量
     private fun smoothVolumeChange(newVolume: Int): Int {
-        return (currentVolume + newVolume) / 2
+        return volumeChangeSmoother.invoke(currentVolume, newVolume)
     }
 
     private fun getIdleHeight(x: Int): Float {
